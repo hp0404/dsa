@@ -46,4 +46,10 @@ print(docs.raw_data[0])
 
 # опрацьовані дані, перший документ
 print(docs.processed_data[0])
+
+# збереження як json
+docs.save(json_file="test.json")
+
+# збереження як jsonl
+docs.save(jsonl_file="test.jsonl")
 ```
