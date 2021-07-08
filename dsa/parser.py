@@ -24,6 +24,8 @@ class Documents(DsaConstants):
     >>> from dsa import Documents
     >>> docs = Documents.from_json("data/20210507000000_20210508000000.json", normalize_values=True)
     >>> docs.process_documents()
+    >>> docs.save(json_file="test.json")
+    >>> docs.save(jsonl_file="test.jsonl)
     """
 
     @classmethod
@@ -36,6 +38,22 @@ class Documents(DsaConstants):
         self.raw_data = data["items"]
         self.normalize_values = normalize_values
         self.processed_data = None
+
+    def save(self, json_file=None, jsonl_file=None):
+        if self.processed_data is None:
+            raise ValueError("Process data first.")
+        if json_file is None and jsonl_file is None:
+            raise ValueError("Provide json/jsonl file paths.")
+        if jsonl_file is not None:
+            with open(jsonl_file, "w", encoding="utf-8") as f:
+                for line in self.processed_data:
+                    json.dump(line, f, ensure_ascii=False)
+                    f.write("\n")
+        if json_file is not None:
+            with open(json_file, "w", encoding="utf-8") as f:
+                json.dump(
+                    {"items": self.processed_data}, f, ensure_ascii=False, indent=4
+                )
 
     def process_documents(self):
         self.processed_data = [*self.yield_records()]
