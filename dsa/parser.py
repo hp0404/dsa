@@ -9,27 +9,33 @@ from .constants import DsaConstants
 
 
 class Documents(DsaConstants):
-    
     @classmethod
-    def from_json(cls, json_file, remap=True):
+    def from_json(cls, json_file, normalize_values=True):
         with open(json_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return cls(data, remap)
+        return cls(data, normalize_values)
 
-    def __init__(self, data, remap=True):
-        self.data = data
-        self.remap = remap
+    def __init__(self, data, normalize_values=True):
+        self.data = data["items"]
+        self.normalize_values = normalize_values
         self.processed = None
 
-    def process(self):
-        self.processed = deepcopy(self.data)
-        for document in self.processed["items"]:
+    def process_documents(self):
+        self.processed = [*self.yield_records()]
+
+    def yield_records(self):
+        for document in self.data:
             if "DOC_HTML" not in document:
+                yield document
                 continue
-            html = self._extract_html(document["DOC_HTML"])
-            metadata = self._extract_metadata(html)
-            document.update(metadata)
-            document.pop("DOC_HTML")
+            yield from self.process_record(document)
+
+    def process_record(self, record):
+        html = self._extract_html(record["DOC_HTML"])
+        metadata = self._extract_metadata(html)
+        d = {**record, **metadata}
+        d.pop("DOC_HTML")
+        yield d
 
     def _extract_html(self, b64zip):
         base = base64.b64decode(b64zip)
@@ -44,14 +50,16 @@ class Documents(DsaConstants):
             name, content = item.get("name"), item.get("content")
             if name is None:
                 continue
-            remove_digits = str.maketrans("", "", digits)
-            lookup_name = name.translate(remove_digits)
-            if self.remap:
-                metadata[name] = (
-                    Documents.MAPPINGS[lookup_name].get(content, content)
-                    if lookup_name in Documents.MAPPINGS.keys()
-                    else content
-                )
-            else:
-                metadata[name] = content
+            metadata[name] = (
+                self._lookup_values(name, content) if self.normalize_values else content
+            )
         return metadata
+
+    def _lookup_values(self, name, values):
+        remove_digits = str.maketrans("", "", digits)
+        lookup_name = name.translate(remove_digits)
+        return (
+            Documents.MAPPINGS[lookup_name].get(values, values)
+            if lookup_name in Documents.MAPPINGS.keys()
+            else values
+        )
