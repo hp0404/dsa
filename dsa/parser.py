@@ -3,7 +3,6 @@ import io
 import json
 import base64
 import zipfile
-from copy import deepcopy
 from string import digits
 from bs4 import BeautifulSoup
 from .constants import DsaConstants
@@ -34,15 +33,15 @@ class Documents(DsaConstants):
         return cls(data, normalize_values)
 
     def __init__(self, data, normalize_values=True):
-        self.data = data["items"]
+        self.raw_data = data["items"]
         self.normalize_values = normalize_values
-        self.processed = None
+        self.processed_data = None
 
     def process_documents(self):
-        self.processed = [*self.yield_records()]
+        self.processed_data = [*self.yield_records()]
 
     def yield_records(self):
-        for document in self.data:
+        for document in self.raw_data:
             if "DOC_HTML" not in document:
                 yield document
                 continue
