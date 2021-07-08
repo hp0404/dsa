@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 import json
 import base64
@@ -9,6 +10,23 @@ from .constants import DsaConstants
 
 
 class Documents(DsaConstants):
+    """Papers retrieved from Microsoft Academic API.
+
+    Attributes
+    ----------
+    data: dict
+        open-data file's content
+    normalize_values: bool, defaults to True
+        looks up values retrieved from html comment tags
+        and replaces, e.g. "2" to "рішення".
+
+    Usage
+    -----
+    >>> from dsa import Documents
+    >>> docs = Documents.from_json("data/20210507000000_20210508000000.json", normalize_values=True)
+    >>> docs.process_documents()
+    """
+
     @classmethod
     def from_json(cls, json_file, normalize_values=True):
         with open(json_file, "r", encoding="utf-8") as f:

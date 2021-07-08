@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 class DsaConstants:
+    """Lookup values retrieved from html comment tags."""
     MAPPINGS = {
         "DOCTYPE": {
             "1": "вирок",
