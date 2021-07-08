@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 class DsaConstants:
+    """Lookup values retrieved from html comment tags."""
     MAPPINGS = {
         "DOCTYPE": {
             "1": "вирок",
@@ -47,4 +49,10 @@ class DsaConstants:
             "U": "юридична",
             "F": "фізична",
         },
+        "CAUSELOCATION": {
+            "P": "перша",
+            "A": "апеляційна",
+            "C": "касаційна",
+            "I": "інша",
+        }
     }

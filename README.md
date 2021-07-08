@@ -35,12 +35,21 @@ $ . env/bin/activate
 from dsa import Documents
 
 # поки тестую на одному файлі
-docs = Documents.from_json("data/20210507000000_20210508000000.json", remap=True)
-docs.process()
+docs = Documents.from_json(
+    "../data/20210507000000_20210508000000.json",
+    normalize_values=True
+)
+docs.process_documents()
 
-# оригінальний документ
-print(docs.data["items"][0])
+# оригінальні дані, перший документ
+print(docs.raw_data[0])
 
-# опрацьований документ
-print(docs.processed["items"][0])
+# опрацьовані дані, перший документ
+print(docs.processed_data[0])
+
+# збереження як json
+docs.save(json_file="test.json")
+
+# збереження як jsonl
+docs.save(jsonl_file="test.jsonl")
 ```
